@@ -6,8 +6,8 @@ output: html_document
 ---
 
 ```{r}
-library(usethis)
-usethis::use_git()
+#library(usethis)
+#usethis::use_git()
 ```
 
 ```{r}
