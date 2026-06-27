@@ -12,7 +12,7 @@ library(readxl)
 ```
 
 ```{r}
-sat_data <- read_xlsx("Pareto Frontier Example.xlsx")
+sat_data <- read_xlsx("data/Pareto Frontier Example.xlsx")
 
 ggplot(sat_data, aes(x = SAT, y = 0, shape = Race)) + 
     geom_point(size = 5) + 

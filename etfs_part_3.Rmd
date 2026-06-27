@@ -13,11 +13,11 @@ options(scipen = 999)
 ```
 
 ```{r df_creation}
-VBK <- read_csv("VBK Weekly.csv")
-VTV <- read_csv("VTV Weekly.csv")
-VUG <- read_csv("VUG Weekly.csv")
-VBR <- read_csv("VBR (1).csv")
-TNX <- read_csv("^TNX (1).csv")
+VBK <- read_csv("data/VBK Weekly.csv")
+VTV <- read_csv("data/VTV Weekly.csv")
+VUG <- read_csv("data/VUG Weekly.csv")
+VBR <- read_csv("data/VBR (1).csv")
+TNX <- read_csv("data/^TNX (1).csv")
 
 VBK$Date <- as.Date(VBK$Date)
 VTV$Date <- as.Date(VTV$Date)
@@ -72,7 +72,7 @@ excess_log_returns <- rolling_1yr_avg_return %>%
     na.omit()
 
 # library(writexl)
-# write_xlsx(historical_log_returns, "cov_test.xlsx")
+# write_xlsx(historical_log_returns, "outputs/cov_test.xlsx")
 
 ```
 

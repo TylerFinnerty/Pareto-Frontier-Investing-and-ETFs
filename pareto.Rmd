@@ -19,7 +19,7 @@ library(rvest)
 ```
 
 ```{r}
-tickers <- read_xlsx("Holdings_duplicates_comparison.xlsx")
+tickers <- read_xlsx("data/Holdings_duplicates_comparison.xlsx")
 ```
 
 # STOCK SELECTION
@@ -99,7 +99,7 @@ type_ticker <- type_ticker %>%
 ```{r scraping_prof_inv}
 library(httr)
 
-# nyse_tickers <- read_xlsx("nyse_tickers.xlsx")
+# nyse_tickers <- read_xlsx("data/nyse_tickers.xlsx")
 # scrape_symbol <- nyse_tickers$Symbol
 scrape_symbol_test <- type_ticker$ticker 
 items <- c("net-income", "total-liabilities") # "net-income" should be "operating-income"
@@ -236,8 +236,8 @@ for(i in 1:nrow(unlisted_custom_names)) {
     }
 }
 
-write_csv(total_liabilities_df, "total_liabilities_df.csv")
-write_csv(net_income_df, "net_income_df.csv")
+write_csv(total_liabilities_df, "outputs/total_liabilities_df.csv")
+write_csv(net_income_df, "outputs/net_income_df.csv")
 ```
 
 ```{r scraping_pb}
@@ -314,14 +314,14 @@ for (name in names(data_frames_list)) {
     colnames(price_book_df)[ncol(price_book_df)] <- ticker
 }
 
-write_csv(price_book_df, "price_book_df.csv")
+write_csv(price_book_df, "outputs/price_book_df.csv")
 ```
 
 
 # ANALYSIS PARTS
 
 ```{r pb_cols}
-price_book_df <- read_csv("price_book_df.csv")
+price_book_df <- read_csv("outputs/price_book_df.csv")
 
 price_book_df$Date <- mdy(price_book_df$Date)
 
@@ -388,7 +388,7 @@ final_df <- mkt_cap %>%
 ```
 
 ```{r sp500_stuff}
-sp500_data <- read_csv("^GSPC_daily_historical_data.csv")
+sp500_data <- read_csv("data/^GSPC_daily_historical_data.csv")
 
 sp500_2015 <- sp500_data %>% 
     select(Date, 'Adj Close') %>% 
@@ -409,7 +409,7 @@ sp500_standard_deviation <- sd(sp500_2020$daily_log_return, na.rm = TRUE) * sqrt
 ```
 
 ```{r}
-twenty_raw <- read_csv("20_stocks_2.csv")
+twenty_raw <- read_csv("data/20_stocks_2.csv")
 
 twenty <- twenty_raw %>% 
     select(Date, 'Adj Close', Ticker)

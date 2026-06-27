@@ -17,6 +17,12 @@ cache/
 *.utf8.md
 *.knit.md
 
+# Project data and generated outputs
+data/*
+!data/.gitkeep
+outputs/*
+!outputs/.gitkeep
+
 # Quarto cache, if applicable
 .quarto/
 

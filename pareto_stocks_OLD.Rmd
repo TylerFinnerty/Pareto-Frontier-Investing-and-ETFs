@@ -13,7 +13,7 @@ library(dplyr)
 ```
 
 ```{r}
-tickers <- read_xlsx("Holdings_duplicates_comparison.xlsx")
+tickers <- read_xlsx("data/Holdings_duplicates_comparison.xlsx")
 ```
 
 ```{r}
@@ -86,7 +86,7 @@ final_df <- mkt_cap %>%
 ```
 
 ```{r sp500_stuff}
-sp500_data <- read_csv("^GSPC_daily_historical_data.csv")
+sp500_data <- read_csv("data/^GSPC_daily_historical_data.csv")
 
 sp500_2015 <- sp500_data %>% 
     select(Date, 'Adj Close') %>% 
@@ -107,7 +107,7 @@ sp500_standard_deviation <- sd(sp500_2020$daily_log_return, na.rm = TRUE) * sqrt
 ```
 
 ```{r}
-twenty_raw <- read_csv("20_stocks_2.csv")
+twenty_raw <- read_csv("data/20_stocks_2.csv")
 
 twenty <- twenty_raw %>% 
     select(Date, 'Adj Close', Ticker)
