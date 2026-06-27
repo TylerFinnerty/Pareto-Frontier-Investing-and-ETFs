@@ -1,0 +1,68 @@
+---
+title: "Pareto SAT Example"
+author: "Tyler Finnerty"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(readxl)
+```
+
+```{r}
+sat_data <- read_xlsx("Pareto Frontier Example.xlsx")
+
+ggplot(sat_data, aes(x = SAT, y = 0, shape = Race)) + 
+    geom_point(size = 5) + 
+    scale_shape_manual(values = c("Circle" = 1, "Square" = 0)) + 
+    theme(panel.background = element_blank(),
+          axis.text.y = element_blank(),
+          axis.ticks = element_blank()) +
+    labs(y = "", x = "SAT Score") + 
+    geom_hline(yintercept = 0)
+```
+
+```{r}
+data <- sat_data
+
+# Sort the data by SAT score in descending order
+data <- data %>% arrange(desc(SAT))
+
+# Initialize vectors to store error and unfairness values
+error <- numeric(nrow(data))
+unfairness <- numeric(nrow(data))
+
+# Initialize variables to store counts of successes by race
+success_circle <- sum(data$Success[data$Race == "Circle"])
+success_square <- sum(data$Success[data$Race == "Square"])
+
+# Iterate through each subset of individuals with decreasing SAT scores
+for (i in 1:nrow(data)) {
+  subset_data <- data[1:i, ]
+  
+  # Calculate error: sum of 0s in accepted set and 1s in rejected set
+  error[i] <- sum(subset_data$Success == 0) + 
+      (sum(data$Success == 1) - sum(subset_data$Success == 1))
+  
+  # Calculate unfairness: absolute difference in success counts between Circle and Square races
+  unfairness[i] <- (
+      (sum(data$Success[data$Race == "Square"] == 1) - 
+      sum(subset_data$Success[subset_data$Race == "Square"] == 1)) -
+      (sum(data$Success[data$Race == "Circle"] == 1) - 
+      sum(subset_data$Success[subset_data$Race == "Circle"] == 1)))
+}
+
+# Create a data frame with error and unfairness values
+pareto_data <- data.frame(Error = error, Unfairness = unfairness)
+
+# Plot the Pareto frontier
+ggplot(pareto_data, aes(x = Error, y = Unfairness)) +
+    geom_point(size = 4) +
+    labs(x = "Error", y = "Unfairness") +
+    scale_x_continuous(breaks = seq(0, max(pareto_data$Error), by = 2)) +
+    theme_minimal()
+
+```
+

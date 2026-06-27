@@ -1,0 +1,29 @@
+# R session files
+.Rhistory
+.RData
+.Ruserdata/
+
+# RStudio project state
+.Rproj.user/
+
+# R package/build artifacts
+.Rbuildignore
+*.Rcheck/
+*.tar.gz
+
+# knitr / R Markdown cache
+*_cache/
+cache/
+*.utf8.md
+*.knit.md
+
+# Quarto cache, if applicable
+.quarto/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log

@@ -1,0 +1,97 @@
+---
+title: "etfs_part_3"
+author: "Tyler Finnerty"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup}
+library(tidyverse)
+library(readr)
+library(dplyr)
+options(scipen = 999)
+```
+
+```{r df_creation}
+VBK <- read_csv("VBK Weekly.csv")
+VTV <- read_csv("VTV Weekly.csv")
+VUG <- read_csv("VUG Weekly.csv")
+VBR <- read_csv("VBR (1).csv")
+TNX <- read_csv("^TNX (1).csv")
+
+VBK$Date <- as.Date(VBK$Date)
+VTV$Date <- as.Date(VTV$Date)
+VUG$Date <- as.Date(VUG$Date)
+VBR$Date <- as.Date(VBR$Date)
+TNX$Date <- as.Date(TNX$Date)
+
+historical_prices <- VBR %>%
+    select(Date, 'Adj Close') %>%
+    rename(small_value = 'Adj Close') %>%
+    inner_join(
+        VBK %>% select(Date, 'Adj Close') %>%
+            rename(small_growth = 'Adj Close'),
+        by = "Date"
+    ) %>%
+    inner_join(
+        VTV %>% select(Date, 'Adj Close') %>%
+            rename(large_value = 'Adj Close'),
+        by = "Date"
+    ) %>%
+    inner_join(
+        VUG %>% select(Date, 'Adj Close') %>%
+            rename(large_growth = 'Adj Close'),
+        by = "Date"
+    ) %>% 
+    inner_join(
+        TNX %>% select(Date, 'Adj Close') %>% 
+            rename(ten_year_yield = 'Adj Close'),
+        by = "Date"
+    )
+
+historical_log_returns <- historical_prices %>% 
+    mutate(sv_return = log(small_value / lag(small_value, 1)) * 100,
+           sg_return = log(small_growth / lag(small_growth, 1)) * 100,
+           lv_return = log(large_value / lag(large_value, 1)) * 100,
+           lg_return = log(large_growth / lag(large_growth, 1)) * 100,
+           ten_year_yield = log(1 + ten_year_yield)) %>% 
+    na.omit()
+
+library(zoo)
+rolling_1yr_avg_return <- historical_log_returns %>% 
+    mutate(sv_1yr = rollmean(sv_return, k = 52, align = "right", fill = NA) * 52,
+           sg_1yr = rollmean(sg_return, k = 52, align = "right", fill = NA) * 52,
+           lv_1yr = rollmean(lv_return, k = 52, align = "right", fill = NA) * 52,
+           lg_1yr = rollmean(lg_return, k = 52, align = "right", fill = NA) * 52)
+
+excess_log_returns <- rolling_1yr_avg_return %>% 
+    mutate(sv_excess = sv_1yr - ten_year_yield,
+           sg_excess = sg_1yr - ten_year_yield,
+           lv_excess = lv_1yr - ten_year_yield,
+           lg_excess = lg_1yr - ten_year_yield) %>% 
+    na.omit()
+
+# library(writexl)
+# write_xlsx(historical_log_returns, "cov_test.xlsx")
+
+```
+
+```{r sharpe_corr_ex}
+etf_returns <- excess_log_returns %>% 
+    select(sv_return, sg_return)
+
+means <- colMeans(etf_returns) * 52
+
+stdev <- sapply(etf_returns, sd) * sqrt(52)
+    
+sharpe_ratio <- (means - 2.29) / stdev
+
+# NOTE: need the difference of excess returns, can divide the log returns of tyy by
+# 52 but that gives the weekly 1 year moving average and i need the absolute log return
+# change week to week to calculate the difference i think.
+
+corr_matrix <- cor(etf_returns)
+
+
+```
+

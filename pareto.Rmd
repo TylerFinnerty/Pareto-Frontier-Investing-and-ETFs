@@ -1,0 +1,658 @@
+---
+title: "Pareto"
+author: "Tyler Finnerty"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r}
+library(usethis)
+usethis::use_git()
+
+```
+
+```{r}
+library(tidyverse)
+library(readr)
+library(readxl)
+library(dplyr)
+library(rvest)
+```
+
+```{r}
+tickers <- read_xlsx("Holdings_duplicates_comparison.xlsx")
+```
+
+# STOCK SELECTION
+
+```{r random_stock_selection}
+set.seed(1)
+# Group the data by stock type and then sample 5 stocks from each group
+selected_stocks <- tickers %>%
+  group_by(ETF) %>%
+  sample_n(size = 5, replace = FALSE)
+
+set.seed(2)
+selected_stocks_2 <- tickers %>%
+  group_by(ETF) %>%
+  sample_n(size = 5, replace = FALSE)
+
+set.seed(3)
+selected_stocks_3 <- tickers %>%
+  group_by(ETF) %>%
+  sample_n(size = 5, replace = FALSE)
+
+set.seed(4)
+selected_stocks_4 <- tickers %>%
+  group_by(ETF) %>%
+  sample_n(size = 5, replace = FALSE)
+
+# replacing certain stocks
+final_stocks <- selected_stocks
+final_stocks[4, ] <- selected_stocks_2[3, ]
+final_stocks[10, ] <- selected_stocks_2[9, ]
+final_stocks[11, ] <- selected_stocks_3[11, ]
+final_stocks[12, ] <- selected_stocks_3[12, ]
+final_stocks[13, ] <- selected_stocks_3[14, ]
+final_stocks[14, ] <- selected_stocks_4[13, ]
+final_stocks[18, ] <- selected_stocks_2[19, ]
+```
+
+```{r manual_entry}
+type_ticker <- final_stocks %>% 
+    select(ETF, HOLDINGS, TICKER) %>% 
+    rename(type = ETF, name = HOLDINGS, ticker = TICKER)
+
+# Manually adding market caps as of Jan 05, 2015. Millions of nominal US $
+# mkt_caps_2015 <- c("8440", "24680", "5630", "340950", "21390", 
+#                    "4080", "19120", "3250", "76510", "10080",
+#                    "870", "920", "2670", "1160", "3110",
+#                    "1690", "14920", "4590", "1020", "3240")
+
+# Manually adding p/b ratios Dec 31 2014 or Jan 31 2015
+# pb_ratios_2015 <- c("8.63", "0.86", "6.21", "3.48", "0.88",
+#                     "3.84", "2.46", "1.92", "1.34", "1.30",
+#                     "1.57", "1.18", "7.92", "6.52", "6.58",
+#                     "0.67", "4.27", "2.54", "0.68", "3.82")
+
+# Manually adding market caps as of Dec 30, 2019. Millions of nominal US $
+mkt_caps_2020 <- c(30330, 16740, 14200, 934640, 37870,
+                  13770, 21980, 14130, 88820, 16490, 
+                  2860, 2410, 2770, 2620, 6320, 
+                  1880, 6190, 4310, 1660, 3170)
+
+# Manually adding p/b ratios Dec 31 2019 or Jan 31 2020
+# pb_ratios_2020 <- c(15.98, 0.67, 11.70, 4.58, 2.24, 
+#                     6.43, 2.32, 3.80, 1.45, 1.31, 
+#                     21.66, 1.96, 3.12, 8.66, 6.09, 
+#                     1.13, 5.27, 2.03, 1.34, 2.03)
+
+type_ticker <- type_ticker %>% 
+    ungroup() %>% 
+    mutate(mkt_cap_2020 = mkt_caps_2020)#, pb_ratio_2020 = pb_ratios_2020)
+```
+
+# SCRAPING
+
+## WARNING!! THIS CODE TAKES A LONG TIME TO RUN
+## SKIP THIS CODE BECAUSE THE .csv FILES HAVE ALREADY BEEN CREATED
+
+```{r scraping_prof_inv}
+library(httr)
+
+# nyse_tickers <- read_xlsx("nyse_tickers.xlsx")
+# scrape_symbol <- nyse_tickers$Symbol
+scrape_symbol_test <- type_ticker$ticker 
+items <- c("net-income", "total-liabilities") # "net-income" should be "operating-income"
+user_agent_string <- "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
+
+custom_name_list <- list()
+
+for(symbol in scrape_symbol_test){
+    for(item in items){
+        url <- paste0("https://macrotrends.net/stocks/charts/",symbol,"/",symbol,"/",item,"/")
+        
+        custom_name <- paste(symbol, "_", item, sep = "")
+        assign(custom_name, GET(url, add_headers('user-agent' = user_agent_string)))
+        
+        custom_name_list <- c(custom_name_list, custom_name)
+
+        if (status_code(get(custom_name)) != 200){
+            print(paste0("Failed to retrieve ", custom_name))
+            break
+        }
+        print(paste0("Retrieved ", custom_name))
+ 
+        Sys.sleep(15)
+    }
+    Sys.sleep(60)
+}
+
+for(name in custom_name_list){
+    # Extract tables from the response
+    tables <- get(name) %>%
+        content() %>%
+        html_nodes("table")
+    
+    # Extracting data from the tables
+    data_rows <- tables %>% 
+        html_nodes("tbody") %>% 
+        html_nodes("tr")
+        
+    # Extracting data from each row
+    data <- lapply(data_rows, function(row) {
+        row %>% 
+            html_nodes("td") %>% 
+            html_text() %>%
+            trimws()  # remove leading/trailing whitespaces
+    })
+    
+    
+    
+    ### CREATING THE DATA FRAMES WITH `data` 
+    # Find the index of the first date in "YYYY-MM-DD" format
+    first_date_index <- NULL
+    
+    for (i in seq_along(data)) {
+        if (any(grepl("^\\d{4}-\\d{2}-\\d{2}$", data[[i]]))) {
+            first_date_index <- i
+            break
+        }
+    }
+    
+    # Extract dates and values using regular expressions starting from the first date
+    if (!is.null(first_date_index)) {
+        dates <- unlist(lapply(data[first_date_index:length(data)], function(vec) grep("\\d{4}-\\d{2}-\\d{2}", vec, value = TRUE)))
+        values <- unlist(lapply(data[first_date_index:length(data)], function(vec) grep("^\\$\\d{1,3}(,\\d{3})*$", vec, value = TRUE)))
+        
+        # Make sure both vectors have the same length by filling missing values with NA
+        max_length <- max(length(dates), length(values))
+        dates <- c(dates, rep(NA, max_length - length(dates)))
+        values <- c(values, rep(NA, max_length - length(values)))
+        
+        # Create a data frame
+        assign(paste0(name, "_df"),
+                data.frame(Date = as.Date(dates), 
+                           Value = as.numeric(gsub("\\$|,", "", values))))
+        
+    } else {
+        print("No date in 'YYYY-MM-DD' format found in ", data)
+    }
+}
+
+```
+
+```{r dates_df}
+library(lubridate)
+
+# Start date
+start_date <- ymd("2009-01-01")
+
+# End date
+end_date <- ymd("2024-03-31")
+
+# Generate sequence of dates
+dates <- seq(start_date, end_date, by = "month")
+
+# Get last day of each month
+last_days <- ceiling_date(dates, "month") - days(1)
+
+# Create data frame
+dates_df <- data.frame(Date = last_days) %>% 
+    arrange(desc(Date))
+
+```
+
+```{r prof_inv_df_creation}
+# Initialize the data frames with all the dates
+total_liabilities_df <- dates_df
+net_income_df <- dates_df
+
+unlisted_custom_names <- as.data.frame(unlist(custom_name_list)) %>% 
+    rename(name_type = `unlist(custom_name_list)`) %>% 
+    mutate(count = row_number())
+
+# total_lia_custom_names <- unlisted_custom_names %>% 
+#     filter(.$name_type == paste0(type_ticker$ticker, "_total-liabilities"))
+# only returning the final FHI_total-liabilities instead of all of them
+
+# total_lia_custom_names <- unlisted_custom_names[unlisted_custom_names$name_type == paste0(type_ticker$ticker, "_total-liabilities"), , drop = FALSE]
+
+# Assuming you already have created total_liabilities_df and net_income_df as empty data frames
+ticker_col <- character()
+
+for(i in 1:nrow(unlisted_custom_names)) {
+    df_name <- paste0(unlisted_custom_names$name_type[i], "_df")
+    ticker <- sub("_.*", "", df_name)  # Extract ticker symbol from df_name
+    
+    if(grepl("total-liabilities", df_name)) {
+        data <- get(df_name)
+        colnames(data) <- c("Date", paste0(ticker, "_Total_Liabilities"))
+        total_liabilities_df <- merge(total_liabilities_df, data, by = "Date", all.x = TRUE)
+        ticker_col <- c(ticker_col, ticker)
+    } else if (grepl("net-income", df_name)) {
+        data <- get(df_name)
+        colnames(data) <- c("Date", paste0(ticker, "_Net_Income"))
+        net_income_df <- merge(net_income_df, data, by = "Date", all.x = TRUE)
+    }
+}
+
+write_csv(total_liabilities_df, "total_liabilities_df.csv")
+write_csv(net_income_df, "net_income_df.csv")
+```
+
+```{r scraping_pb}
+scrape_symbol_test <- type_ticker$ticker 
+items_pb <- c("price-book") 
+user_agent_string <- "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
+
+custom_name_list <- list()
+
+for(symbol in scrape_symbol_test){
+    for(item in items_pb){
+        url <- paste0("https://macrotrends.net/stocks/charts/",symbol,"/",symbol,"/",item,"/")
+        
+        custom_name <- paste(symbol, "_", item, sep = "")
+        assign(custom_name, GET(url, add_headers('user-agent' = user_agent_string)))
+        
+        custom_name_list <- c(custom_name_list, custom_name)
+
+        if (status_code(get(custom_name)) != 200){
+            print(paste0("Failed to retrieve ", custom_name))
+            break
+        }
+        print(paste0("Retrieved ", custom_name))
+ 
+        Sys.sleep(30)
+    }
+    # Sys.sleep(60)
+}
+
+
+data_frames_list <- list()
+
+for(name in custom_name_list){
+    # Extract tables from the response
+    tables <- get(name) %>%
+        content() %>%
+        html_nodes("table")
+    
+    # Extracting data from the tables
+    data_rows <- tables %>% 
+        html_nodes("tbody") %>% 
+        html_nodes("tr")
+        
+    # Extracting data from each row
+    data <- lapply(data_rows, function(row) {
+        row %>% 
+            html_nodes("td") %>% 
+            html_text() %>%
+            trimws()  # remove leading/trailing whitespaces
+    })
+    
+    df <- data.frame(matrix(unlist(data), nrow = length(data), byrow = TRUE))
+    
+    # Extract ticker and item from name
+    parts <- strsplit(name, "_")[[1]]
+    ticker <- parts[1]
+    item <- parts[2]
+    
+    df_name <- paste(ticker, item, "df", sep = "_")
+    
+    # Store the data frame in the list
+    data_frames_list[[df_name]] <- df
+}
+
+price_book_df <- dates_df
+
+for (name in names(data_frames_list)) {
+    # Extract ticker name from the data frame name
+    ticker <- gsub("_df", "", name)
+    
+    X4_column <- data_frames_list[[name]]$X4
+    df <- data.frame(Date = data_frames_list[[name]]$X1, X4 = X4_column)
+    price_book_df <- merge(price_book_df, df, by = "Date", all.x = TRUE)
+    colnames(price_book_df)[ncol(price_book_df)] <- ticker
+}
+
+write_csv(price_book_df, "price_book_df.csv")
+```
+
+
+# ANALYSIS PARTS
+
+```{r pb_cols}
+price_book_df <- read_csv("price_book_df.csv")
+
+price_book_df$Date <- mdy(price_book_df$Date)
+
+prev_cutoff_date <- as.Date("2019-11-30")
+cutoff_date <- as.Date("2019-12-31")
+next_cutoff_date <- as.Date("2020-01-31")
+cutoff_index <- which(price_book_df$Date == cutoff_date)
+
+
+pb_cutoff_df <- price_book_df %>% 
+    filter(Date == cutoff_date) %>% 
+    select(2:21)
+
+pb_cutoff_df <- pb_cutoff_df %>%
+    mutate(across(where(is.na), ~ {
+        col_name <- cur_column()
+        price_book_df %>% 
+            filter(Date == next_cutoff_date) %>% 
+            pull(col_name)
+  }))
+
+pb_cutoff_df <- pb_cutoff_df %>%
+    mutate(across(where(is.na), ~ {
+        col_name <- cur_column()
+        price_book_df %>% 
+            filter(Date == prev_cutoff_date) %>% 
+            pull(col_name)
+  }))
+
+pb_cutoff_df <- pb_cutoff_df %>% 
+    rename_all(~ gsub("_price-book", "", .))
+
+
+pb_ratio_2020 <- pivot_longer(cols = everything(), pb_cutoff_df, names_to = "ticker", values_to = "pb_ratio_2020")
+
+type_ticker <- inner_join(type_ticker, pb_ratio_2020, by = "ticker")
+```
+
+
+```{r}
+# 2015
+# type_ticker$mkt_cap_2015 <- as.numeric(type_ticker$mkt_cap_2015)
+# type_ticker$pb_ratio_2015 <- as.numeric(type_ticker$pb_ratio_2015)
+# 
+# mkt_cap <- type_ticker %>% 
+#     arrange(desc(mkt_cap_2015))
+# 
+# final_df <- mkt_cap %>% 
+#     mutate(size = ifelse(mkt_cap_2015 > median(mkt_cap_2015), "Large", "Small"),
+#            value = ifelse(pb_ratio_2015 > median(pb_ratio_2015), "Growth", "Value")) %>% 
+#     select(-type)
+
+# 2020
+type_ticker$mkt_cap_2020 <- as.numeric(type_ticker$mkt_cap_2020)
+type_ticker$pb_ratio_2020 <- as.numeric(type_ticker$pb_ratio_2020)
+
+mkt_cap <- type_ticker %>% 
+    arrange(desc(mkt_cap_2020))
+
+final_df <- mkt_cap %>% 
+    mutate(size = ifelse(mkt_cap_2020 > median(mkt_cap_2020), "Large", "Small"),
+           value = ifelse(pb_ratio_2020 > median(pb_ratio_2020), "Growth", "Value")) %>% 
+    select(-type)
+```
+
+```{r sp500_stuff}
+sp500_data <- read_csv("^GSPC_daily_historical_data.csv")
+
+sp500_2015 <- sp500_data %>% 
+    select(Date, 'Adj Close') %>% 
+    mutate(across(-Date, ~ log(. / lag(.)))) %>% 
+    rename(daily_log_return = 'Adj Close') %>% 
+    filter(Date >= as.Date("2015-01-01") & Date <= as.Date("2019-12-31"))
+
+sp500_log_return <- sapply(sp500_2015[-1], function(x) mean(x, na.rm = TRUE)) * 252
+
+sp500_2020 <- sp500_data %>% 
+    select(Date, 'Adj Close') %>% 
+    mutate(across(-Date, ~ log(. / lag(.)))) %>% 
+    rename(daily_log_return = 'Adj Close') %>% 
+    filter(Date >= as.Date("2020-01-01"))
+
+sp500_avg_yearly_log_return <- mean(sp500_2020$daily_log_return, na.rm = TRUE) * 252
+sp500_standard_deviation <- sd(sp500_2020$daily_log_return, na.rm = TRUE) * sqrt(252)
+```
+
+```{r}
+twenty_raw <- read_csv("20_stocks_2.csv")
+
+twenty <- twenty_raw %>% 
+    select(Date, 'Adj Close', Ticker)
+
+twenty_final <- twenty %>% 
+    pivot_wider(., names_from = Ticker, values_from = 'Adj Close') %>% 
+    na.omit()
+
+log_returns <- twenty_final %>%
+    mutate(across(-Date, ~ log(. / lag(.)))) %>% 
+    filter(Date >= as.Date("2015-01-01") & Date <= as.Date("2019-12-31"))
+
+# then follow the SAT example:
+## Accuracy = accuracy of picking outperformers
+## fairness = inclusion of all outperformers
+
+# Calculate the average log return for each ticker
+yearly_log_returns <- sapply(log_returns[-1], function(x) mean(x, na.rm = TRUE)) * 252
+
+# Create a new data frame to store ticker names and average log returns vertically
+vertical_df <- data.frame(ticker = names(yearly_log_returns), 
+                          average_log_return = yearly_log_returns) %>% 
+    mutate(outperform = ifelse(average_log_return > sp500_log_return, 1, 0)) # check outperformance
+
+final_df <- inner_join(final_df, vertical_df, by = "ticker")
+```
+
+```{r no_groups_test}
+# Initialize vectors to store accuracy and inclusion values
+accuracy_values <- c()
+inclusion_values <- c()
+
+# Loop over each row of the data frame
+for (i in 1:nrow(final_df)) {
+  
+  # Subset data up to the current row
+  subset_data <- final_df[1:i, ]
+  
+  # Calculate accuracy
+  accuracy <- sum(subset_data$outperform == 1) +
+      (sum(final_df$outperform == 0) - sum(subset_data$outperform == 0))
+  
+  # Calculate inclusion
+  inclusion <- sum(final_df$outperform == 1) - sum(subset_data$outperform == 1) - 
+      (sum(final_df$outperform == 0) - sum(subset_data$outperform == 0))
+  
+  # Append accuracy and inclusion values to vectors
+  accuracy_values <- c(accuracy_values, accuracy)
+  inclusion_values <- c(inclusion_values, inclusion)
+}
+
+# Create a data frame to store accuracy and inclusion values
+plot_data <- data.frame(Stock_Number = 1:nrow(mkt_cap),
+                        Accuracy = accuracy_values,
+                        Inclusion = inclusion_values)
+
+# Plot accuracy against inclusion
+ggplot(plot_data, aes(x = Accuracy, y = Inclusion)) +
+  geom_point() +
+  labs(x = "Accuracy", y = "Inclusion") +
+  theme_minimal() 
+
+# the plot is just a line, i think its because there isn't two distinct groups that
+# we are trying to be fair to. There might be a way around this without creating groups 
+
+```
+
+```{r by_mkt_cap}
+by_mkt_cap <- final_df %>% 
+    arrange(desc(mkt_cap_2020)) %>% 
+    mutate(Stock_Number = 1:nrow(final_df))
+
+# Initialize vectors to store accuracy and inclusion values
+accuracy <- numeric(nrow(by_mkt_cap))
+inclusion <- numeric(nrow(by_mkt_cap))
+
+# Initialize variables to store counts of outperform by value
+outperform_growth <- sum(by_mkt_cap$outperform[by_mkt_cap$value == "Growth"])
+outperform_value <- sum(by_mkt_cap$outperform[by_mkt_cap$value == "Value"])
+
+# Iterate through each subset of individuals with decreasing SAT scores
+for (i in 1:nrow(by_mkt_cap)) {
+  subset_data <- by_mkt_cap[1:i, ]
+  
+  # Calculate accuracy: sum of 1s in outperform set and 0s in underperform set
+    accuracy[i] <- sum(subset_data$outperform == 1) + 
+        (sum(by_mkt_cap$outperform == 0) - sum(subset_data$outperform == 0))
+  
+  # Calculate inclusion: 
+    inclusion[i] <- sum(subset_data$outperform[subset_data$value == "Value"] == 1) -
+        sum(subset_data$outperform[subset_data$value == "Growth"] == 1)
+}
+
+
+pareto_data <- data.frame(accuracy = accuracy, inclusion = inclusion)
+
+
+# Create a data frame to store accuracy and inclusion values
+plot_data <- data.frame(Stock_Number = 1:nrow(final_df),
+                        Accuracy = accuracy,
+                        Inclusion = inclusion)
+
+# Plot accuracy against inclusion
+ggplot(plot_data, aes(x = Accuracy, y = Inclusion)) +
+  geom_point(size = 5) +
+  labs(x = "Accuracy", y = "Inclusion") +
+  theme_minimal() 
+
+joined_mkt_cap <- inner_join(by_mkt_cap, plot_data, by = "Stock_Number") %>% 
+    select(-Stock_Number)
+
+example_table_1 <- joined_mkt_cap %>% 
+    select(-c("pb_ratio_2020","size"))
+
+```
+
+```{r portfolio_test_1}
+portfolio_1_tickers <- example_table_1 %>% 
+    slice(1:11) %>% # Change this to 12:20 to test the rejected performance
+    select(ticker)
+
+portfolio_1_tickers$ticker
+
+portfolio_test_1 <- twenty_final %>% 
+    select(Date, portfolio_1_tickers$ticker) %>% 
+    filter(Date >= as.Date("2020-01-01"))
+
+portfolio_test_1 <- portfolio_test_1 %>%
+  mutate(across(all_of(portfolio_1_tickers$ticker), 
+                ~ log(. / lag(.)), 
+                .names = "{col}_log_return"))
+
+log_return_cols <- paste0(portfolio_1_tickers$ticker, "_log_return")
+
+# Calculate averages and standard deviations for each stock
+port1_averages <- colMeans(select(portfolio_test_1, 
+                                  all_of(log_return_cols)),
+                           na.rm = TRUE) * 252
+port1_standard_deviations <- apply(select(portfolio_test_1,
+                                          all_of(log_return_cols)),
+                                   2,
+                                   sd,
+                                   na.rm = TRUE) * sqrt(252)
+
+# Create a new data frame with ticker, average, and standard deviation
+portfolio_1_mean_sd <- data.frame(
+  ticker = names(port1_averages),
+  avg_yearly_log_return = port1_averages,
+  yearly_sd = port1_standard_deviations
+)
+
+avg_portfolio_1_log_return <- mean(portfolio_1_mean_sd$avg_yearly_log_return)
+avg_portfolio_1_sd <- mean(portfolio_1_mean_sd$yearly_sd)
+```
+
+
+```{r by_pb_ratio}
+by_pb_ratio <- final_df 
+
+by_pb_ratio <- by_pb_ratio %>% 
+    arrange((pb_ratio_2020)) %>% 
+    mutate(Stock_Number = 1:nrow(final_df))
+
+
+# Initialize vectors to store accuracy and inclusion values
+accuracy_2 <- numeric(nrow(by_pb_ratio))
+inclusion_2 <- numeric(nrow(by_pb_ratio))
+
+# Initialize variables to store counts of successes by race
+outperform_large <- sum(by_pb_ratio$outperform[by_pb_ratio$size == "Large"])
+outperform_small <- sum(by_pb_ratio$outperform[by_pb_ratio$size == "Small"])
+
+# Iterate through each subset of individuals with decreasing SAT scores
+for (i in 1:nrow(by_pb_ratio)) {
+  subset_data <- by_pb_ratio[1:i, ]
+  
+  # Calculate accuracy: sum of 1s in outperform set and 0s in underperform set
+    accuracy[i] <- sum(subset_data$outperform == 1) + 
+        (sum(by_pb_ratio$outperform == 0) - sum(subset_data$outperform == 0))
+  
+  # Calculate inclusion: difference of correctly included small and large stocks
+    inclusion[i] <- sum(subset_data$outperform[subset_data$size == "Small"] == 1) -
+        sum(subset_data$outperform[subset_data$size == "Large"] == 1)
+}
+
+
+pareto_data_2 <- data.frame(accuracy = accuracy, inclusion = inclusion)
+
+
+# Create a data frame to store accuracy and inclusion values
+plot_data_2 <- data.frame(Stock_Number = 1:nrow(final_df),
+                        Accuracy = accuracy,
+                        Inclusion = inclusion)
+
+# Plot accuracy against inclusion
+ggplot(plot_data_2, aes(x = Accuracy, y = Inclusion)) +
+  geom_point(size = 5) +
+  labs(x = "Accuracy", y = "Inclusion") +
+  theme_minimal() 
+
+joined_pb_ratio <- inner_join(by_pb_ratio, plot_data_2, by = "Stock_Number") %>% 
+    select(-Stock_Number)
+
+example_table_2 <- joined_pb_ratio %>% 
+    select(-c("mkt_cap_2020", "value"))
+```
+
+```{r portfolio_test_2}
+portfolio_2_tickers <- example_table_2 %>% 
+    slice(1:18) %>% 
+    select(ticker)
+
+portfolio_2_tickers$ticker
+
+portfolio_test_2 <- twenty_final %>% 
+    select(Date, portfolio_2_tickers$ticker) %>% 
+    filter(Date >= as.Date("2020-01-01"))
+
+portfolio_test_2 <- portfolio_test_2 %>%
+  mutate(across(all_of(portfolio_2_tickers$ticker), 
+                ~ log(. / lag(.)), 
+                .names = "{col}_log_return"))
+
+log_return_cols_2 <- paste0(portfolio_2_tickers$ticker, "_log_return")
+
+# Calculate averages and standard deviations for each stock
+port2_averages <- colMeans(select(portfolio_test_2, 
+                                  all_of(log_return_cols_2)),
+                           na.rm = TRUE) * 252
+port2_standard_deviations <- apply(select(portfolio_test_2,
+                                          all_of(log_return_cols_2)),
+                                   2,
+                                   sd,
+                                   na.rm = TRUE) * sqrt(252)
+
+# Create a new data frame with ticker, average, and standard deviation
+portfolio_2_mean_sd <- data.frame(
+  ticker = names(port2_averages),
+  avg_yearly_log_return = port2_averages,
+  yearly_sd = port2_standard_deviations
+)
+
+avg_portfolio_2_log_return <- mean(portfolio_2_mean_sd$avg_yearly_log_return)
+avg_portfolio_2_sd <- mean(portfolio_2_mean_sd$yearly_sd)
+```
