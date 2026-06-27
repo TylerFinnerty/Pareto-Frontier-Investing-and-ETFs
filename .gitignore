@@ -27,3 +27,6 @@ desktop.ini
 
 # Logs
 *.log
+.Rproj.user
+.httr-oauth
+.quarto
