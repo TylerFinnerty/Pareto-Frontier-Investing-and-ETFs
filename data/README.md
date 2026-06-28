@@ -38,27 +38,22 @@ Files from sections 1-3 were originally downloaded from [Yahoo Finance](https://
   - `data/downloaded/vtv_weekly.csv`
   - `data/downloaded/vug_weekly.csv`
 - Used by: `notebooks/etfs_part_3.Rmd`
-- These are weekly historical price files with the standard columns `Date`, `Open`, `High`, `Low`, `Close`, `Adj Close`, and `Volume`.
 
 **2. Weekly ten-year Treasury yield file**
 - Expected file: `data/downloaded/tnx_weekly.csv`
 - Used by: `notebooks/etfs_part_3.Rmd`
-- This replaces the original browser-download style name `^TNX (1).csv`.
 
 **3. S&P 500 daily historical price file**
 - Expected file: `data/downloaded/sp500_daily.csv`
 - Used by: `notebooks/pareto.Rmd`
-- This replaces the original name `^GSPC_daily_historical_data.csv`.
 
 **4. Twenty-stock Pareto example price file**
 - Expected file: `data/downloaded/pareto_20_stocks_daily.csv`
 - Used by: `notebooks/pareto.Rmd`
-- Contains daily price data for the 20-stock sample used in the Pareto frontier analysis.
 
 **5. Vanguard holdings comparison workbook**
 - Expected file: `data/downloaded/vanguard_holdings_duplicates_comparison.xlsx`
 - Used by: `notebooks/pareto.Rmd`
-- Contains the ETF holdings/ticker universe used to sample stocks for the Pareto example.
 
 **6. NYSE ticker list**
 - Expected file: `data/downloaded/nyse_tickers.xlsx`
@@ -78,4 +73,4 @@ The notebook has scraping chunks for:
 - `total-liabilities`
 - `price-book`
 
-Historical metrics were difficult to collect, and the notebook includes long sleep intervals between requests to avoid getting blocked by [TO DO].
+Historical metrics were difficult to collect, and the notebook includes long sleep intervals between requests to avoid getting blocked by bot detection.
