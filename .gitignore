@@ -20,6 +20,9 @@ cache/
 # Project data and generated outputs
 data/*
 !data/.gitkeep
+!data/Archive/
+data/Archive/*
+!data/Archive/.gitkeep
 outputs/*
 !outputs/.gitkeep
 
