@@ -14,7 +14,9 @@ Can factor-exposed ETFs and Pareto frontier analysis provide a useful way to ide
 ## Key Results
 - The VBR small-cap value ETF had the second lowest average yearly log-return over the past ten years, while VUG large-cap growth returned by far the highest.
 
-  ![Average yearly log-returns for Vanguard factor-exposed ETFs](outputs/etf_average_log_returns.png)
+<p align="center">
+  <img src="outputs/etf_average_log_returns.png" alt="ETF Average Log Returns Table" width="500">
+</p>
 
 - Given the previous findings of Fama and French, we would expect small-cap value stocks to have the highest return and large-cap growth stocks to have the lowest return. The recent overperformance of the market risk factor, combined with recent negative excess returns for the size and value risk factors, helps explain the Vanguard ETF results.
 
