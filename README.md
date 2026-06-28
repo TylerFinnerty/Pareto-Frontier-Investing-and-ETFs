@@ -15,7 +15,7 @@ Can factor-exposed ETFs and Pareto frontier analysis provide a useful way to ide
 - The VBR small-cap value ETF had the second lowest average yearly log-return over the past ten years, while VUG large-cap growth returned by far the highest.
 
 <p align="center">
-  <img src="outputs/etf_average_log_returns.png" alt="ETF Average Log Returns Table" width="500">
+  <img src="outputs/etf_average_log_returns.png" alt="ETF Average Log Returns Table" width="300">
 </p>
 
 - Given the previous findings of Fama and French, we would expect small-cap value stocks to have the highest return and large-cap growth stocks to have the lowest return. The recent overperformance of the market risk factor, combined with recent negative excess returns for the size and value risk factors, helps explain the Vanguard ETF results.
@@ -24,7 +24,9 @@ Can factor-exposed ETFs and Pareto frontier analysis provide a useful way to ide
 
 - The S&P 500 average yearly Sharpe ratio was right on par with VUG's Sharpe ratio, suggesting that VUG's strong recent return also held up reasonably well on a risk-adjusted basis.
 
-  ![Average yearly Sharpe ratios for Vanguard factor-exposed ETFs](outputs/etf_sharpe_ratios.png)
+<p align="center">
+  <img src="outputs/etf_sharpe_ratios.png" alt="Average yearly Sharpe ratios for Vanguard factor-exposed ETFs" width="300">
+</p>
 
 - The Pareto frontier analysis identifies portfolios that balance accuracy and inclusion, with the frontier showing where one measurement cannot be improved without worsening the other.
 
@@ -32,15 +34,21 @@ Can factor-exposed ETFs and Pareto frontier analysis provide a useful way to ide
 
 - The selected Pareto portfolio used a market-cap cutoff to form a hypothetical ETF of 11 stocks, with the selection table showing each stock's factor grouping, historical return, outperformance status, accuracy, and inclusion values.
 
-  ![Pareto-selected stock table](outputs/pareto_selection_table.png)
+<p align="center">
+  <img src="outputs/pareto_selection_table.png" alt="Pareto-selected stock table">
+</p>
 
 - The hypothetical Pareto ETF performed decently, yielding an average annual log-return of 8.3%, but still underperformed the S&P 500. More alarmingly, the Pareto ETF's volatility was almost twice that of the S&P 500, primarily because only 11 stocks were included in the portfolio.
 
-  ![Out-of-sample performance of the Pareto ETF versus the S&P 500](outputs/pareto_vs_sp500_performance.png)
+<p align="center">
+  <img src="outputs/pareto_vs_sp500_performance.png" alt="Out-of-sample performance of the Pareto ETF versus the S&P 500" width="300">
+</p>
 
 - The Pareto ETF outperformed the rejected-stock portfolio in average yearly log-return and had lower volatility, but the t-test was not significant at a 90% confidence level, so the result does not provide strong statistical support for the model.
 
-  ![Performance of the Pareto ETF versus the rejected-stock portfolio](outputs/pareto_vs_rejected_portfolio.png)
+<p align="center">
+  <img src="outputs/pareto_vs_rejected_portfolio.png" alt="Performance of the Pareto ETF versus the rejected-stock portfolio" width="300">
+</p>
 
 ## Data
 Aside from a few files that I manually constructed, raw, downloaded, and scraped datasets are not included in this repository. See `data/README.md` for the expected folder layout, manual download files, and scraped data files.
