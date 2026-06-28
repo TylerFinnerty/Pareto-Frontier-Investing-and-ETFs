@@ -6,6 +6,8 @@ output: html_document
 ---
 
 ```{r}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+
 library(tidyverse)
 library(ggplot2)
 library(readxl)

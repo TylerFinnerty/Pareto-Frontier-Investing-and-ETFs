@@ -17,6 +17,9 @@ cache/
 *.utf8.md
 *.knit.md
 
+# Archived notebooks
+notebooks/archive/
+
 # Project data and generated outputs
 data/*
 !data/.gitkeep

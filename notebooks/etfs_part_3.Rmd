@@ -6,6 +6,8 @@ output: html_document
 ---
 
 ```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+
 library(tidyverse)
 library(readr)
 library(dplyr)
