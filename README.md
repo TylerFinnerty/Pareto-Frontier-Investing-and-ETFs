@@ -23,7 +23,7 @@ Can factor-exposed ETFs and Pareto frontier analysis provide a useful way to ide
 - A t-test comparing the Pareto ETF and the rejected portfolio was not significant at a 90% confidence level and easily rejects this model, though this may be due to the small sample size.
 
 ## Data
-Raw, downloaded, and scraped datasets are not included in this repository. See `data/README.md` for the expected folder layout, manual download files, and scraped data files.
+Aside from a few files that I manually constructed, raw, downloaded, and scraped datasets are not included in this repository. See `data/README.md` for the expected folder layout, manual download files, and scraped data files.
 
 This project uses ETF price data, factor data, market-cap data, P/B ratios, and stock-level data needed to test Vanguard factor-exposed ETFs and construct the Pareto frontier example.
 
