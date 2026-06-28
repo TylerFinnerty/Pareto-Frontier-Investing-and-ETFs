@@ -47,6 +47,7 @@ data/scraped/*
 # Generated outputs
 outputs/*
 !outputs/.gitkeep
+*.docx
 
 # Quarto cache, if applicable
 .quarto/
