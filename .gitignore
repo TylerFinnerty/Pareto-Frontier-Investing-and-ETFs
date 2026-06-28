@@ -24,15 +24,27 @@ notebooks/archive/
 data/*
 !data/.gitkeep
 !data/README.md
+
+# Keep downloaded folder structure, but ignore downloaded data by default
 !data/downloaded/
 data/downloaded/*
 !data/downloaded/.gitkeep
+
+# Allowed committed downloaded/example files
+!data/downloaded/vanguard_etf_returns.xlsx
+!data/downloaded/pareto_frontier_example.xlsx
+
+# Keep archive folder structure, but ignore archived data
 !data/downloaded/archive/
 data/downloaded/archive/*
 !data/downloaded/archive/.gitkeep
+
+# Keep scraped folder structure, but ignore scraped data by default
 !data/scraped/
 data/scraped/*
 !data/scraped/.gitkeep
+
+# Generated outputs
 outputs/*
 !outputs/.gitkeep
 
