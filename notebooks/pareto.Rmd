@@ -96,13 +96,12 @@ type_ticker <- type_ticker %>%
 # SCRAPING
 
 ## WARNING!! THIS CODE TAKES A LONG TIME TO RUN
-## SKIP THIS CODE BECAUSE THE .csv FILES HAVE ALREADY BEEN CREATED
 
 ```{r scraping_prof_inv}
 library(httr)
 
-# nyse_tickers <- read_xlsx("data/downloaded/nyse_tickers.xlsx")
-# scrape_symbol <- nyse_tickers$Symbol
+nyse_tickers <- read_xlsx("data/downloaded/nyse_tickers.xlsx")
+scrape_symbol <- nyse_tickers$Symbol
 scrape_symbol_test <- type_ticker$ticker 
 items <- c("net-income", "total-liabilities") # "net-income" should be "operating-income"
 user_agent_string <- "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
