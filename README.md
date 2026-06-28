@@ -12,15 +12,33 @@ Using the knowledge of the five factors, this project identifies factor-exposed 
 Can factor-exposed ETFs and Pareto frontier analysis provide a useful way to identify and select stocks for the formation of diversified portfolios or ETFs?
 
 ## Key Results
-[TODO: Add final charts/tables from `outputs/` once the repo figures are ready.]
-
 - The VBR small-cap value ETF had the second lowest average yearly log-return over the past ten years, while VUG large-cap growth returned by far the highest.
-- Given the previous findings of Fama and French, we would expect small-cap value stocks to have the highest return and large-cap growth stocks to have the lowest return.
-- The recent overperformance of the market risk factor, combined with recent negative excess returns for the size and value risk factors, helps explain the Vanguard ETF results.
-- The S&P 500 average yearly Sharpe ratio was right on par with VUG's Sharpe ratio.
-- The hypothetical Pareto ETF performed decently, yielding an average annual log-return of 8.3%, but still underperformed the S&P 500.
-- More alarmingly, the Pareto ETF's volatility was almost twice that of the S&P 500, primarily because only 11 stocks were included in the portfolio.
-- A t-test comparing the Pareto ETF and the rejected portfolio was not significant at a 90% confidence level and easily rejects this model, though this may be due to the small sample size.
+
+  ![Average yearly log-returns for Vanguard factor-exposed ETFs](outputs/etf_average_log_returns.png)
+
+- Given the previous findings of Fama and French, we would expect small-cap value stocks to have the highest return and large-cap growth stocks to have the lowest return. The recent overperformance of the market risk factor, combined with recent negative excess returns for the size and value risk factors, helps explain the Vanguard ETF results.
+
+  ![Rolling excess returns for market, size, and value factors](outputs/factor_rolling_excess_returns.png)
+
+- The S&P 500 average yearly Sharpe ratio was right on par with VUG's Sharpe ratio, suggesting that VUG's strong recent return also held up reasonably well on a risk-adjusted basis.
+
+  ![Average yearly Sharpe ratios for Vanguard factor-exposed ETFs](outputs/etf_sharpe_ratios.png)
+
+- The Pareto frontier analysis identifies portfolios that balance accuracy and inclusion, with the frontier showing where one measurement cannot be improved without worsening the other.
+
+  ![Pareto frontier scatter plot of accuracy and inclusion](outputs/pareto_frontier_accuracy_inclusion.png)
+
+- The selected Pareto portfolio used a market-cap cutoff to form a hypothetical ETF of 11 stocks, with the selection table showing each stock's factor grouping, historical return, outperformance status, accuracy, and inclusion values.
+
+  ![Pareto-selected stock table](outputs/pareto_selection_table.png)
+
+- The hypothetical Pareto ETF performed decently, yielding an average annual log-return of 8.3%, but still underperformed the S&P 500. More alarmingly, the Pareto ETF's volatility was almost twice that of the S&P 500, primarily because only 11 stocks were included in the portfolio.
+
+  ![Out-of-sample performance of the Pareto ETF versus the S&P 500](outputs/pareto_vs_sp500_performance.png)
+
+- The Pareto ETF outperformed the rejected-stock portfolio in average yearly log-return and had lower volatility, but the t-test was not significant at a 90% confidence level, so the result does not provide strong statistical support for the model.
+
+  ![Performance of the Pareto ETF versus the rejected-stock portfolio](outputs/pareto_vs_rejected_portfolio.png)
 
 ## Data
 Aside from a few files that I manually constructed, raw, downloaded, and scraped datasets are not included in this repository. See `data/README.md` for the expected folder layout, manual download files, and scraped data files.
