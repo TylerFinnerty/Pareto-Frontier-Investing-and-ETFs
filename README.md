@@ -114,8 +114,8 @@ Out-of-sample performance is then tested from January 2020 to April 2024. A reje
 |   |-- downloaded/                # Manually downloaded source files
 |   `-- scraped/                   # Cached data scraped by the notebooks
 |-- notebooks/
-|   |-- etfs_part_2.Rmd           # Vanguard ETF return analysis
-|   |-- etfs_part_3.Rmd           # ETF log-return, excess-return, and Sharpe calculations
+|   |-- etfs_part_1.Rmd           # Vanguard ETF return analysis
+|   |-- etfs_part_2.Rmd           # ETF log-return, excess-return, and Sharpe calculations
 |   |-- pareto.Rmd                # Pareto frontier stock-selection analysis
 |   `-- pareto_SAT_example.Rmd    # Pareto frontier example notebook
 |-- outputs/                      # Generated figures and analysis outputs
