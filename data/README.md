@@ -29,7 +29,7 @@ data/
 
 ## Files You Need to Get Manually
 
-Files from sections 1-3 were originally downloaded from Yahoo Finance historical data pages. As of June 2026 it appears Yahoo Finance restricts CSV downloads without a paid subscription. Users may need to recreate these files using the free trial of Yahoo Finance Gold, using yfR to scrape the data, or via another free historical price website.
+Files from sections 1-3 were originally downloaded from [Yahoo Finance](https://finance.yahoo.com/) historical data pages. As of June 2026 it appears Yahoo Finance restricts CSV downloads without a paid subscription. Users may need to recreate these files using the free trial of Yahoo Finance Gold, using yfR to scrape the data, or via another free historical price website.
 
 **1. Weekly ETF price files**
 - Expected files:
