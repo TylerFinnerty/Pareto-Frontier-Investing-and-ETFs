@@ -1,0 +1,70 @@
+---
+title: "etfs_part_2"
+author: "Tyler Finnerty"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup}
+knitr::opts_knit$set(root.dir = normalizePath(".."))
+
+library(tidyverse)
+library(readxl)
+library(writexl)
+```
+
+```{r read_files}
+VBR <- read_xlsx("data/downloaded/vanguard_etf_returns.xlsx", sheet = "VBR")
+VBK <- read_xlsx("data/downloaded/vanguard_etf_returns.xlsx", sheet = "VBK")
+VTV <- read_xlsx("data/downloaded/vanguard_etf_returns.xlsx", sheet = "VTV")
+VUG <- read_xlsx("data/downloaded/vanguard_etf_returns.xlsx", sheet = "VUG")
+```
+
+```{r pivot_longer}
+library(dplyr)
+options(scipen = 999)
+
+small_value <- VBR %>% 
+    pivot_longer(., 
+                 cols = -Year,
+                 names_to = "quarter",
+                 values_to = "growth") %>% 
+    filter(quarter != "Year-end", quarter != "Benchmark1", Year != "2024") %>% 
+    mutate(etf_type = "small_value",
+           growth = as.numeric(growth))
+
+small_growth <- VBK %>% 
+    pivot_longer(., 
+                 cols = -Year,
+                 names_to = "quarter",
+                 values_to = "growth") %>% 
+    filter(quarter != "Year-end", quarter != "Benchmark1", Year != "2024") %>% 
+    mutate(etf_type = "small_growth",
+           growth = as.numeric(growth))
+
+large_value <- VTV %>% 
+    pivot_longer(., 
+                 cols = -Year,
+                 names_to = "quarter",
+                 values_to = "growth") %>% 
+    filter(quarter != "Year-end", quarter != "Benchmark1", Year != "2024") %>% 
+    mutate(etf_type = "large_value",
+           growth = as.numeric(growth))
+
+large_growth <- VUG %>% 
+    pivot_longer(., 
+                 cols = -Year,
+                 names_to = "quarter",
+                 values_to = "growth") %>% 
+    filter(quarter != "Year-end", quarter != "Benchmark1", Year != "2024") %>% 
+    mutate(etf_type = "large_growth",
+           growth = as.numeric(growth))
+```
+
+```{r summary_statistics}
+summary(small_value)
+summary(small_growth)
+summary(large_value)
+summary(large_growth)
+```
+
