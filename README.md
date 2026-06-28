@@ -105,9 +105,9 @@ Run the notebooks from the project root or use the existing notebook setup chunk
 
 - **R**: Main language for the analysis
 - **R Markdown**: Used for analysis notebooks and reporting
-- **tidyverse / dplyr**: Used to clean, reshape, join, and compute over the data
+- **tidyverse / dplyr**: Used to clean, reshape, and join the data
 - **readr / readxl / writexl**: Used to read and write CSV and Excel files
-- **rvest / httr**: Used for web scraping stock-level historical metrics
+- **rvest / httr**: Used for web scraping historical stock metrics
 - **zoo**: Used for rolling return calculations
 
 ## Limitations and Future Work
