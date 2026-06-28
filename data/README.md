@@ -37,11 +37,11 @@ Files from sections 1-4 were originally downloaded from [Yahoo Finance](https://
   - `data/downloaded/vbr_weekly.csv`
   - `data/downloaded/vtv_weekly.csv`
   - `data/downloaded/vug_weekly.csv`
-- Used by: `notebooks/etfs_part_2.Rmd`
+- Used by: `notebooks/etfs_analysis.Rmd`
 
 **2. Weekly ten-year Treasury yield file**
 - Expected file: `data/downloaded/tnx_weekly.csv`
-- Used by: `notebooks/etfs_part_2.Rmd`
+- Used by: `notebooks/etfs_analysis.Rmd`
 
 **3. S&P 500 daily historical price file**
 - Expected file: `data/downloaded/sp500_daily.csv`

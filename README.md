@@ -114,11 +114,10 @@ Out-of-sample performance is then tested from January 2020 to April 2024. A reje
 |   |-- downloaded/                # Manually downloaded source files
 |   `-- scraped/                   # Cached data scraped by the notebooks
 |-- notebooks/
-|   |-- etfs_part_1.Rmd           # Vanguard ETF return analysis
-|   |-- etfs_part_2.Rmd           # ETF log-return, excess-return, and Sharpe calculations
-|   |-- pareto.Rmd                # Pareto frontier stock-selection analysis
-|   `-- pareto_SAT_example.Rmd    # Pareto frontier example notebook
-|-- outputs/                      # Generated figures and analysis outputs
+|   |-- etfs_analysis.Rmd          # ETF log-return, excess-return, and Sharpe calculations
+|   |-- pareto.Rmd                 # Pareto frontier stock-selection analysis
+|   `-- pareto_SAT_example.Rmd     # Pareto frontier example notebook
+|-- outputs/                       # Generated figures and analysis outputs
 |-- Finnerty - Factor-Based Pareto Frontier Investing and Exchange Traded Funds.pdf
 |-- fin_mat_proj.Rproj
 |-- LICENSE
@@ -128,7 +127,7 @@ Out-of-sample performance is then tested from January 2020 to April 2024. A reje
 ## Reproducing the Project
 The pipeline runs primarily through two notebooks in `notebooks/`:
 
-1. `etfs_part_2.Rmd` Calculates log-returns, 1-year average rolling returns, excess returns over the 10-year yield, and Sharpe metrics for each of the Vanguard ETFs.
+1. `etfs_analysis.Rmd` Calculates log-returns, 1-year average rolling returns, excess returns over the 10-year yield, and Sharpe metrics for each of the Vanguard ETFs.
 2. `pareto.Rmd` Constructs an ETF or portfolio using the principles of a Pareto frontier conducted on a sample of S&P 500 stocks and compares performance metrics like Sharpe and volatility.
 
 These notebooks should be run from inside the `notebooks/` folder so the relative paths work correctly. Most raw and cleaned data isn't committed to the repo. (See `data/README.md` for the folder layout, manual downloads, and generated files).
