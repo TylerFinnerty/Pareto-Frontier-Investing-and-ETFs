@@ -14,10 +14,10 @@ library(writexl)
 ```
 
 ```{r read_files}
-VBR <- read_xlsx("data/vanguard_etf_returns.xlsx", sheet = "VBR")
-VBK <- read_xlsx("data/vanguard_etf_returns.xlsx", sheet = "VBK")
-VTV <- read_xlsx("data/vanguard_etf_returns.xlsx", sheet = "VTV")
-VUG <- read_xlsx("data/vanguard_etf_returns.xlsx", sheet = "VUG")
+VBR <- read_xlsx("data/downloaded/vanguard_etf_returns.xlsx", sheet = "VBR")
+VBK <- read_xlsx("data/downloaded/vanguard_etf_returns.xlsx", sheet = "VBK")
+VTV <- read_xlsx("data/downloaded/vanguard_etf_returns.xlsx", sheet = "VTV")
+VUG <- read_xlsx("data/downloaded/vanguard_etf_returns.xlsx", sheet = "VUG")
 ```
 
 ```{r pivot_longer}

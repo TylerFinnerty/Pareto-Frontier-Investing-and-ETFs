@@ -23,9 +23,16 @@ notebooks/archive/
 # Project data and generated outputs
 data/*
 !data/.gitkeep
-!data/Archive/
-data/Archive/*
-!data/Archive/.gitkeep
+!data/README.md
+!data/downloaded/
+data/downloaded/*
+!data/downloaded/.gitkeep
+!data/downloaded/archive/
+data/downloaded/archive/*
+!data/downloaded/archive/.gitkeep
+!data/scraped/
+data/scraped/*
+!data/scraped/.gitkeep
 outputs/*
 !outputs/.gitkeep
 

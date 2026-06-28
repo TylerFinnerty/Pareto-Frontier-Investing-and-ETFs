@@ -15,11 +15,11 @@ options(scipen = 999)
 ```
 
 ```{r df_creation}
-VBK <- read_csv("data/VBK Weekly.csv")
-VTV <- read_csv("data/VTV Weekly.csv")
-VUG <- read_csv("data/VUG Weekly.csv")
-VBR <- read_csv("data/VBR (1).csv")
-TNX <- read_csv("data/^TNX (1).csv")
+VBK <- read_csv("data/downloaded/vbk_weekly.csv")
+VTV <- read_csv("data/downloaded/vtv_weekly.csv")
+VUG <- read_csv("data/downloaded/vug_weekly.csv")
+VBR <- read_csv("data/downloaded/vbr_weekly.csv")
+TNX <- read_csv("data/downloaded/tnx_weekly.csv")
 
 VBK$Date <- as.Date(VBK$Date)
 VTV$Date <- as.Date(VTV$Date)
