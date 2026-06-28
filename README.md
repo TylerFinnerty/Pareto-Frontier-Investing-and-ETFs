@@ -126,11 +126,12 @@ Out-of-sample performance is then tested from January 2020 to April 2024. A reje
 ```
 
 ## Reproducing the Project
-[TODO: Confirm the exact notebook order and required raw files.]
+The pipeline runs primarily through two notebooks in `notebooks/`:
 
-The analysis is organized in R Markdown notebooks under `notebooks/`.
+1. `etfs_part_2.Rmd` Calculates log-returns, 1-year average rolling returns, excess returns over the 10-year yield, and Sharpe metrics for each of the Vanguard ETFs.
+2. `pareto.Rmd` Constructs an ETF or portfolio using the principles of a Pareto frontier conducted on a sample of S&P 500 stocks and compares performance metrics like Sharpe and volatility.
 
-Run the notebooks from the project root or use the existing notebook setup chunks, which set the knitting root directory to the repository root.
+These notebooks should be run from inside the `notebooks/` folder so the relative paths work correctly. Most raw and cleaned data isn't committed to the repo. (See `data/README.md` for the folder layout, manual downloads, and generated files).
 
 ## Technologies Used
 
