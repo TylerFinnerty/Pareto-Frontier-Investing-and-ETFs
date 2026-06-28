@@ -1,0 +1,15 @@
+# GitHub Linguist language detection
+*.R linguist-language=R linguist-detectable=true
+*.Rmd linguist-language=R linguist-detectable=true
+*.rmd linguist-language=R linguist-detectable=true
+
+# Text normalization
+*.R text eol=lf
+*.Rmd text eol=lf
+*.rmd text eol=lf
+*.csv text eol=lf
+
+# Binary files
+*.pdf binary
+*.xlsx binary
+*.xls binary
