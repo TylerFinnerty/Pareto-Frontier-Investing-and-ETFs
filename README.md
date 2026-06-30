@@ -142,13 +142,6 @@ These notebooks should be run from inside the `notebooks/` folder so the relativ
 - **zoo**: Used for rolling return calculations
 
 ## Limitations and Future Work
-- The primary limitation in the example analysis was the lack of readily available historical metrics.
-- Historical market-cap data was unable to be scraped and needed to be sourced manually.
-- Historical P/B ratio scraping required code that took thirty seconds per stock, which contributed to the small sample size of just 20 stocks.
+- The primary limitation in the example analysis was the lack of readily available historical metrics caused by manual acquisition of market cap data and slow scraping speed of P/B data. A future iteration of this project may look to accelerate the automation of both data collection proocesses to enable a larger (and more meaningful) sample size.
 - Market cap and P/B ratio are dynamic and change throughout time, so it may be better to periodically reclassify stocks and rebalance portfolios, say on a yearly basis.
-- The analysis uses a simple Pareto frontier to select stocks. While it demonstrates the process, it does not yield extraordinarily meaningful results.
-- The first expansion is to increase the sample size. With a larger number of stocks, more concrete findings are expected to emerge.
-- The generalizability of the Pareto frontier can be applied to almost any imaginable stock or company metric.
-- A Pareto frontier can also emerge in higher dimensional space, creating a higher dimensional Pareto frontier of optimal portfolios.
-- The accuracy and inclusion metrics can be altered, or replaced with different methods of measuring portfolio optimization.
-- The binary identifier can be changed to be non-binary, or changed to compare stocks to a different benchmark altogether.
+- The analysis uses a simple Pareto frontier to select stocks. While it demonstrates the process, it does not yield extraordinarily meaningful results. Fortunately, The generalizability of the Pareto frontier can be applied to almost any imaginable stock or company metric. A Pareto frontier can also emerge in higher dimensional space, creating a higher dimensional Pareto frontier of optimal portfolios (though one must be exceptionally careful of the curse of dimensionality).
